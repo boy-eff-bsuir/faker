@@ -11,13 +11,13 @@ namespace Faker.Core
     public class Faker : IFaker
     {  
         private IGeneratorService _generatorService;
-        private List<Type> _usedTypes;
+        private ICycleResolveService _cycleResolveService;
         private IGeneratorContext _context;
-        public Faker(IGeneratorService generatorService)
+        public Faker(IGeneratorService generatorService, ICycleResolveService cycleResolveService)
         {
             _generatorService = generatorService;
-            _usedTypes = new List<Type>();
             _context = new GeneratorContext(new Random(), this);
+            _cycleResolveService = cycleResolveService;
         }
 
         public T Create<T>()
@@ -67,15 +67,15 @@ namespace Faker.Core
             var initParameters = new List<object>();
             foreach(var param in parameters)
             {
-                if (IsCyclic(param.ParameterType))
+                if (_cycleResolveService.Contains(param.ParameterType))
                 {
                     initParameters.Add(null);
                 }
                 else
                 {
-                    _usedTypes.Add(param.ParameterType);
+                    _cycleResolveService.Add(param.ParameterType);
                     var initializedParam = Create(param.ParameterType);
-                    _usedTypes.Remove(param.ParameterType);
+                    _cycleResolveService.Remove(param.ParameterType);
                     initParameters.Add(initializedParam);
                 }
             }
@@ -89,15 +89,15 @@ namespace Faker.Core
             var fields = type.GetFields();
             foreach (var field in fields)
             {
-                if(IsCyclic(field.FieldType))
+                if(_cycleResolveService.Contains(field.FieldType))
                 {
                     field.SetValue(obj, null);
                 }
                 else
                 {
-                    _usedTypes.Add(field.FieldType);
+                    _cycleResolveService.Add(field.FieldType);
                     var result = Create(field.FieldType);
-                    _usedTypes.Remove(field.FieldType);
+                    _cycleResolveService.Remove(field.FieldType);
                     field.SetValue(obj, result);
                 }
             }
@@ -109,23 +109,18 @@ namespace Faker.Core
             var props = type.GetProperties();
             foreach (var prop in props)
             {
-                if(IsCyclic(prop.PropertyType))
+                if(_cycleResolveService.Contains(prop.PropertyType))
                 {
                     prop.SetValue(obj, null);
                 }
                 else 
                 {
-                    _usedTypes.Add(prop.PropertyType);
+                    _cycleResolveService.Add(prop.PropertyType);
                     var result = Create(prop.PropertyType);
-                    _usedTypes.Remove(prop.PropertyType);
+                    _cycleResolveService.Remove(prop.PropertyType);
                     prop.SetValue(obj, result);
                 }
             }
-         }
-
-         private bool IsCyclic(Type t)
-         {
-            return _usedTypes.Contains(t);
          }
     }
 }

@@ -13,7 +13,8 @@ namespace Faker.Tests
         public void GeneratorsDictionaryShouldNotBeEmpty()
         {
             var generatorService = new GeneratorService();
-            Core.Faker sut = new Core.Faker(generatorService);
+            var cycleResolveService = new CycleResolveService();
+            Core.Faker sut = new Core.Faker(generatorService, cycleResolveService);
             var result = sut.Create<User>();
             Assert.NotNull(result);
         }
