@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Faker.Core;
+using Faker.Core.Services;
+using Faker.Tests.Fakes;
 using Xunit;
 
 namespace Faker.Tests
@@ -9,8 +12,9 @@ namespace Faker.Tests
         [Fact]
         public void GeneratorsDictionaryShouldNotBeEmpty()
         {
-            Core.Faker sut = new Core.Faker();
-            var result = sut.Create<List<List<string>>>();
+            var generatorService = new GeneratorService();
+            Core.Faker sut = new Core.Faker(generatorService);
+            var result = sut.Create<User>();
             Assert.NotNull(result);
         }
     }
