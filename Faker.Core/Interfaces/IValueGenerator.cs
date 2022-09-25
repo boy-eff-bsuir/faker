@@ -7,7 +7,7 @@ namespace Faker.Core.Interfaces
 {
     public interface IValueGenerator
     {
-        object Generate(Type typeToGenerate, IGeneratorContext context);
         bool CanGenerate(Type t);
+        object Generate(Type typeToGenerate, IGeneratorContext context);
     }
 }
