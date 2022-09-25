@@ -23,5 +23,10 @@ namespace Faker.Core.Services
         {
             return _types.Contains(t);
         }
+
+        public void Clear()
+        {
+            _types.Clear();
+        }
     }
 }

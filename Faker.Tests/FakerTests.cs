@@ -15,7 +15,7 @@ namespace Faker.Tests
             var generatorService = new GeneratorService();
             var cycleResolveService = new CycleResolveService();
             Core.Faker sut = new Core.Faker(generatorService, cycleResolveService);
-            var result = sut.Create<User>();
+            var result = sut.Create<Struct>();
             Assert.NotNull(result);
         }
     }

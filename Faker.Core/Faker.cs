@@ -58,7 +58,8 @@ namespace Faker.Core
                     System.Console.WriteLine("Exception while initializing type");
                 }
             }
-            return null;
+            var defaultValue = GetDefaultValue(type);
+            return defaultValue;
          }
 
          private object InitializeUserTypeViaConstructor(ConstructorInfo ctor)
@@ -69,7 +70,8 @@ namespace Faker.Core
             {
                 if (_cycleResolveService.Contains(param.ParameterType))
                 {
-                    initParameters.Add(null);
+                    var defaultValue = GetDefaultValue(param.ParameterType);
+                    initParameters.Add(defaultValue);
                 }
                 else
                 {
@@ -89,9 +91,15 @@ namespace Faker.Core
             var fields = type.GetFields();
             foreach (var field in fields)
             {
+                if ((!field.IsPublic) || (field.GetValue(obj) != default))
+                {
+                    continue;
+                }
+
                 if(_cycleResolveService.Contains(field.FieldType))
                 {
-                    field.SetValue(obj, null);
+                    var defaultValue = GetDefaultValue(field.FieldType);
+                    field.SetValue(obj, defaultValue);
                 }
                 else
                 {
@@ -109,9 +117,16 @@ namespace Faker.Core
             var props = type.GetProperties();
             foreach (var prop in props)
             {
+
+                if ((prop.GetSetMethod() == null) || (prop.GetValue(obj) != default))
+                {
+                    continue;
+                }
+
                 if(_cycleResolveService.Contains(prop.PropertyType))
                 {
-                    prop.SetValue(obj, null);
+                    var defaultValue = GetDefaultValue(prop.PropertyType);
+                    prop.SetValue(obj, defaultValue);
                 }
                 else 
                 {
@@ -122,5 +137,15 @@ namespace Faker.Core
                 }
             }
          }
+
+         private object GetDefaultValue(Type t)
+        {
+            if (t.IsValueType)
+                // Для типов-значений вызов конструктора по умолчанию даст default(T).
+                return Activator.CreateInstance(t);
+            else
+                // Для ссылочных типов значение по умолчанию всегда null.
+                return null;
+        }
     }
 }
