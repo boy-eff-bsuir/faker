@@ -16,7 +16,7 @@ namespace Faker.Core.Generators
 
         public object Generate(Type typeToGenerate, IGeneratorContext context)
         {
-            var result = context.Random.Next(_maxValue);
+            var result = (short)context.Random.Next(_maxValue);
             return result;
         }
     }
