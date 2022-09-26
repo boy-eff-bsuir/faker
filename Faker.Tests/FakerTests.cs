@@ -129,5 +129,63 @@ namespace Faker.Tests
             var result = sut.Create<string>();
             result.Should().NotBe(default);
         }
+
+        [Fact]
+        public void ShouldFakeUserType()
+        {
+            var generatorService = new GeneratorService();
+            var cycleResolveService = new CycleResolveService();
+            Core.Faker sut = new Core.Faker(generatorService, cycleResolveService);
+            var result = sut.Create<Class>();
+            result.Should().NotBeNull();
+            result.Name.Should().NotBeNullOrEmpty();
+            result.Age.Should().BeGreaterThan(0);
+            result.Children.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public void ShouldAvoidCyclicDependency()
+        {
+            var generatorService = new GeneratorService();
+            var cycleResolveService = new CycleResolveService();
+            Core.Faker sut = new Core.Faker(generatorService, cycleResolveService);
+            var result = sut.Create<ClassWithCyclicDependency>();
+            result.Should().NotBeNull();
+            result.Name.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public void ShouldNotGeneratePrivateSetters()
+        {
+            var generatorService = new GeneratorService();
+            var cycleResolveService = new CycleResolveService();
+            Core.Faker sut = new Core.Faker(generatorService, cycleResolveService);
+            var result = sut.Create<ClassWithPrivateSetter>();
+            result.Should().NotBeNull();
+            result.PrivateProperty.Should().Be(default);
+        }
+
+        [Fact]
+        public void ShouldUseConstructorWithMoreParams()
+        {
+            var generatorService = new GeneratorService();
+            var cycleResolveService = new CycleResolveService();
+            Core.Faker sut = new Core.Faker(generatorService, cycleResolveService);
+            var result = sut.Create<ClassWithConstructor>();
+            result.Should().NotBeNull();
+            result.PrivateProperty.Should().NotBe(default);
+        }
+
+        [Fact]
+        public void ShouldUseDifferentConstructors()
+        {
+            var generatorService = new GeneratorService();
+            var cycleResolveService = new CycleResolveService();
+            Core.Faker sut = new Core.Faker(generatorService, cycleResolveService);
+            var result = sut.Create<ClassWithBrokenConstructor>();
+            result.Should().NotBeNull();
+            result.Prop1.Should().NotBe(default);
+            result.Prop2.Should().Be(default);
+        }
     }
 }

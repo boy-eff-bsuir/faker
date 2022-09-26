@@ -91,7 +91,8 @@ namespace Faker.Core
             var fields = type.GetFields();
             foreach (var field in fields)
             {
-                if ((!field.IsPublic) || (field.GetValue(obj) != default))
+                if ((!field.IsPublic) || 
+                    (!IsDefault(field.GetValue(obj), field.FieldType)))
                 {
                     continue;
                 }
@@ -118,7 +119,8 @@ namespace Faker.Core
             foreach (var prop in props)
             {
 
-                if ((prop.GetSetMethod() == null) || (prop.GetValue(obj) != default))
+                if ((prop.GetSetMethod() == null) 
+                    || (!IsDefault(prop.GetValue(obj), prop.PropertyType)))
                 {
                     continue;
                 }
@@ -138,7 +140,7 @@ namespace Faker.Core
             }
          }
 
-         private object GetDefaultValue(Type t)
+        private object GetDefaultValue(Type t)
         {
             if (t.IsValueType)
                 // Для типов-значений вызов конструктора по умолчанию даст default(T).
@@ -146,6 +148,19 @@ namespace Faker.Core
             else
                 // Для ссылочных типов значение по умолчанию всегда null.
                 return null;
+        }
+
+        private bool IsDefault(object obj, Type t)
+        {
+            if (t.IsValueType)
+            {
+                var instance = Activator.CreateInstance(t);
+                return obj.Equals(instance);
+            }
+            else
+            {
+                return obj == null;
+            }
         }
     }
 }
