@@ -7,6 +7,7 @@ namespace Faker.Core.Interfaces
 {
     public interface IGeneratorContext
     {
+        string Alphabet { get; }
         Random Random { get; }
         IFaker Faker { get; }
 

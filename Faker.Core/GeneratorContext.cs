@@ -13,6 +13,8 @@ namespace Faker.Core
             this.Random = random;
             Faker = faker;
         }
+        
+        public string Alphabet {get;} = "abcdefghijklmnopqrstuvwxyz";
         public Random Random { get; }
         public IFaker Faker { get; }
     }

@@ -9,7 +9,6 @@ namespace Faker.Core.Generators
 {
     public class StringGenerator : IValueGenerator
     {
-        private string _alphabet = "abcdefghijklmnopqrstuvwxyz";
         private int _minLength = 10;
         private int _maxLength = 32;
         
@@ -25,8 +24,8 @@ namespace Faker.Core.Generators
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < len; i++)
             {
-                var index = context.Random.Next(_alphabet.Length);
-                sb.Append(_alphabet[index]);
+                var index = context.Random.Next(context.Alphabet.Length);
+                sb.Append(context.Alphabet[index]);
             }
             return  sb.ToString();
         }
