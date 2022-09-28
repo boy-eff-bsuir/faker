@@ -7,10 +7,10 @@ namespace Faker.Tests.Fakes
 {
     public class ClassWithConstructor : Class
     {
-        public int PrivateProperty { get; }
-        public ClassWithConstructor(int privateProp)
+        public string PrivateProperty { get; }
+        public ClassWithConstructor(string privateProperty)
         {
-            PrivateProperty = privateProp;
+            PrivateProperty = privateProperty;
         }
     }
 }

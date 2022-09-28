@@ -11,14 +11,29 @@ namespace Faker.Core.Services
     public class GeneratorService : IGeneratorService
     {
         private List<IValueGenerator> _generators;
+        private IGeneratorConfig _config;
+
+        public GeneratorService(IGeneratorConfig config)
+        {
+            InitializeGenerators();
+            _config = config;
+        }
 
         public GeneratorService()
         {
             InitializeGenerators();
         }
 
-        public object Generate(Type type, IGeneratorContext context)
+        public object Generate(Type type, IGeneratorContext context, string name = null)
         {
+            if (name != null && _config != null)
+            {
+                var configGenerator = _config.GetGeneratorByName(name);
+                if (configGenerator != null)
+                {
+                    return configGenerator.Generate(type, context);
+                }
+            }
             var generator = _generators.SingleOrDefault(x => x.CanGenerate(type));
             if (generator == null)
             {

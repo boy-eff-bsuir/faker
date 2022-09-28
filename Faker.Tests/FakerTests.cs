@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Faker.Core;
+using Faker.Core.Configuration;
 using Faker.Core.Services;
 using Faker.Tests.Fakes;
+using Faker.Tests.Generators;
 using FluentAssertions;
 using Xunit;
 
@@ -138,7 +140,7 @@ namespace Faker.Tests
             Core.Faker sut = new Core.Faker(generatorService, cycleResolveService);
             var result = sut.Create<Class>();
             result.Should().NotBeNull();
-            result.Name.Should().NotBeNullOrEmpty();
+            result.FirstName.Should().NotBeNullOrEmpty();
             result.Age.Should().BeGreaterThan(0);
             result.Children.Should().NotBeNullOrEmpty();
         }
@@ -151,7 +153,7 @@ namespace Faker.Tests
             Core.Faker sut = new Core.Faker(generatorService, cycleResolveService);
             var result = sut.Create<ClassWithCyclicDependency>();
             result.Should().NotBeNull();
-            result.Name.Should().NotBeNullOrEmpty();
+            result.FirstName.Should().NotBeNullOrEmpty();
         }
 
         [Fact]
@@ -186,6 +188,33 @@ namespace Faker.Tests
             result.Should().NotBeNull();
             result.Prop1.Should().NotBe(default);
             result.Prop2.Should().Be(default);
+        }
+
+        [Fact]
+        public void ShouldUseGeneratorFromConfig()
+        {
+            var config = new GeneratorConfig();
+            config.Add<Class, string, NameGenerator>(u => u.FirstName);
+            var generatorService = new GeneratorService(config);
+            var cycleResolveService = new CycleResolveService();
+            Core.Faker sut = new Core.Faker(generatorService, cycleResolveService);
+            var result = sut.Create<Class>();
+            result.Should().NotBe(default);
+            result.FirstName.Should().Be("Danila");
+            result.LastName.Should().NotBe("Danila");
+        }
+
+        [Fact]
+        public void ShouldUseGeneratorFromConfigUsingConstructor()
+        {
+            var config = new GeneratorConfig();
+            config.Add<ClassWithConstructor, string, NameGenerator>(u => u.PrivateProperty);
+            var generatorService = new GeneratorService(config);
+            var cycleResolveService = new CycleResolveService();
+            Core.Faker sut = new Core.Faker(generatorService, cycleResolveService);
+            var result = sut.Create<ClassWithConstructor>();
+            result.Should().NotBe(default);
+            result.PrivateProperty.Should().Be("Danila");
         }
     }
 }

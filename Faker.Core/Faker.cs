@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Faker.Core.Configuration;
 using Faker.Core.Exceptions;
+using Faker.Core.Extensions;
+using Faker.Core.Generators;
 using Faker.Core.Interfaces;
 
 namespace Faker.Core
@@ -13,6 +16,7 @@ namespace Faker.Core
         private IGeneratorService _generatorService;
         private ICycleResolveService _cycleResolveService;
         private IGeneratorContext _context;
+
         public Faker(IGeneratorService generatorService, ICycleResolveService cycleResolveService)
         {
             _generatorService = generatorService;
@@ -26,11 +30,11 @@ namespace Faker.Core
             return (T) Create(type);
         }
 
-        private object Create(Type t) 
+        private object Create(Type t, string name = null) 
         {
             try
             {
-                var result = _generatorService.Generate(t, _context);
+                var result = _generatorService.Generate(t, _context, name);
                 return result;
             }
             catch(UnsupportedTypeException)
@@ -76,7 +80,7 @@ namespace Faker.Core
                 else
                 {
                     _cycleResolveService.Add(param.ParameterType);
-                    var initializedParam = Create(param.ParameterType);
+                    var initializedParam = Create(param.ParameterType, param.Name.FirstLetterToUpper());
                     _cycleResolveService.Remove(param.ParameterType);
                     initParameters.Add(initializedParam);
                 }
@@ -105,7 +109,7 @@ namespace Faker.Core
                 else
                 {
                     _cycleResolveService.Add(field.FieldType);
-                    var result = Create(field.FieldType);
+                    var result = Create(field.FieldType, field.Name);
                     _cycleResolveService.Remove(field.FieldType);
                     field.SetValue(obj, result);
                 }
@@ -133,7 +137,7 @@ namespace Faker.Core
                 else 
                 {
                     _cycleResolveService.Add(prop.PropertyType);
-                    var result = Create(prop.PropertyType);
+                    var result = Create(prop.PropertyType, prop.Name);
                     _cycleResolveService.Remove(prop.PropertyType);
                     prop.SetValue(obj, result);
                 }
