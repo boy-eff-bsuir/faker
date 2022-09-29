@@ -216,5 +216,19 @@ namespace Faker.Tests
             result.Should().NotBe(default);
             result.PrivateProperty.Should().Be("Danila");
         }
+
+        [Fact]
+        public void ShouldFakeUserTypeWithRussianProperty()
+        {
+            var generatorService = new GeneratorService();
+            var cycleResolveService = new CycleResolveService();
+            Core.Faker sut = new Core.Faker(generatorService, cycleResolveService);
+            var result = sut.Create<ClassWithRussianProperty>();
+            result.Should().NotBeNull();
+            result.FirstName.Should().NotBeNullOrEmpty();
+            result.Age.Should().BeGreaterThan(0);
+            result.Children.Should().NotBeNullOrEmpty();
+            result.Возраст.Should().BeGreaterThan(0);
+        }
     }
 }
