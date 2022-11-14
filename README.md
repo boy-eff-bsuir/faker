@@ -1,4 +1,4 @@
-# C# objects generator
+# C# fake objects generator
 Technologies:
 * Reflection
 * Expression trees
